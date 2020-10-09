@@ -1164,6 +1164,28 @@ app.get('/search', function(req, res){
 	})
 });
 
+app.get('/search/advance', function(req, res){
+	// TODO: Add in ML feature when we have time
+	console.log('Advance search ' + req.query.query);
+
+	mongo.connect(dbname, function(err, db) {
+		db.collection('pictures').find({ $text : { $search: req.query.query } }).toArray(function(err, search) {
+			if(err) {
+				return err
+			};
+
+			if(search.length > 0) {
+				console.log(search);
+				res.json(search);
+			}
+			else {
+				console.log('No photos found in advance search');
+				res.status(500).send('No photos found containing ' + req.query.query);
+			}
+		})
+	})
+});
+
 app.get('/user_info', login_check, function(req, res){
 	mongo.connect(dbname, function(err, db){
 		db.collection('users').find( { _id : req.session.user._id }).toArray(function(err, users){
